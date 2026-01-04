@@ -242,6 +242,8 @@ https://github.com/ha1tch/minty?tab=Apache-2.0-1-ov-file
 
 ## Author
 
+Copyright (C)2026 haitch
+
 h@ual.fi 
 
 https://oldbytes.space/@haitchfive 
