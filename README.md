@@ -6,6 +6,8 @@
 
 ## DOCS: Completely out of sync, will be updating soon
 
+## EXAMPLES: The code examples are a sample of the best features that already work in minty's current incarnation. Ignore the docs for now.
+
 ## Features
 
 - **Type-safe HTML generation** - Catch errors at compile time, not runtime
