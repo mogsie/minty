@@ -38,6 +38,12 @@ jobs:
             goarch: arm
             goarm: '7'
             suffix: ''
+          - goos: linux
+            goarch: riscv64
+            suffix: ''
+          - goos: linux
+            goarch: ppc64le
+            suffix: ''
           # macOS
           - goos: darwin
             goarch: amd64
@@ -60,6 +66,20 @@ jobs:
             goarch: amd64
             suffix: ''
           - goos: freebsd
+            goarch: arm64
+            suffix: ''
+          # NetBSD
+          - goos: netbsd
+            goarch: amd64
+            suffix: ''
+          - goos: netbsd
+            goarch: arm64
+            suffix: ''
+          # OpenBSD
+          - goos: openbsd
+            goarch: amd64
+            suffix: ''
+          - goos: openbsd
             goarch: arm64
             suffix: ''
     
@@ -127,6 +147,12 @@ jobs:
             goarch: arm
             goarm: '7'
             suffix: ''
+          - goos: linux
+            goarch: riscv64
+            suffix: ''
+          - goos: linux
+            goarch: ppc64le
+            suffix: ''
           # macOS
           - goos: darwin
             goarch: amd64
@@ -149,6 +175,20 @@ jobs:
             goarch: amd64
             suffix: ''
           - goos: freebsd
+            goarch: arm64
+            suffix: ''
+          # NetBSD
+          - goos: netbsd
+            goarch: amd64
+            suffix: ''
+          - goos: netbsd
+            goarch: arm64
+            suffix: ''
+          # OpenBSD
+          - goos: openbsd
+            goarch: amd64
+            suffix: ''
+          - goos: openbsd
             goarch: arm64
             suffix: ''
     
@@ -226,10 +266,8 @@ jobs:
           find artifacts -type f -name "assettrack-*" -exec mv {} release/ \;
           find artifacts -type f -name "insurequote-*" -exec mv {} release/ \;
           
-          # Create archive bundles for convenience
-          cd release
-          
           # Create combined checksums file
+          cd release
           cat *.sha256 > checksums.txt
           
           # List all files
@@ -263,17 +301,29 @@ jobs:
             
             | Platform | AssetTrack | InsureQuote |
             |----------|------------|-------------|
-            | Linux (amd64) | `assettrack-linux-amd64` | `insurequote-linux-amd64` |
-            | Linux (arm64) | `assettrack-linux-arm64` | `insurequote-linux-arm64` |
-            | Linux (386) | `assettrack-linux-386` | `insurequote-linux-386` |
-            | Linux (arm) | `assettrack-linux-arm` | `insurequote-linux-arm` |
-            | macOS (Intel) | `assettrack-darwin-amd64` | `insurequote-darwin-amd64` |
-            | macOS (Apple Silicon) | `assettrack-darwin-arm64` | `insurequote-darwin-arm64` |
-            | Windows (64-bit) | `assettrack-windows-amd64.exe` | `insurequote-windows-amd64.exe` |
-            | Windows (32-bit) | `assettrack-windows-386.exe` | `insurequote-windows-386.exe` |
-            | Windows (ARM64) | `assettrack-windows-arm64.exe` | `insurequote-windows-arm64.exe` |
-            | FreeBSD (amd64) | `assettrack-freebsd-amd64` | `insurequote-freebsd-amd64` |
-            | FreeBSD (arm64) | `assettrack-freebsd-arm64` | `insurequote-freebsd-arm64` |
+            | **Linux** | | |
+            | x86-64 | `assettrack-linux-amd64` | `insurequote-linux-amd64` |
+            | ARM64 | `assettrack-linux-arm64` | `insurequote-linux-arm64` |
+            | x86 (32-bit) | `assettrack-linux-386` | `insurequote-linux-386` |
+            | ARMv7 | `assettrack-linux-arm` | `insurequote-linux-arm` |
+            | RISC-V 64 | `assettrack-linux-riscv64` | `insurequote-linux-riscv64` |
+            | POWER8/9 | `assettrack-linux-ppc64le` | `insurequote-linux-ppc64le` |
+            | **macOS** | | |
+            | Intel | `assettrack-darwin-amd64` | `insurequote-darwin-amd64` |
+            | Apple Silicon | `assettrack-darwin-arm64` | `insurequote-darwin-arm64` |
+            | **Windows** | | |
+            | 64-bit | `assettrack-windows-amd64.exe` | `insurequote-windows-amd64.exe` |
+            | 32-bit | `assettrack-windows-386.exe` | `insurequote-windows-386.exe` |
+            | ARM64 | `assettrack-windows-arm64.exe` | `insurequote-windows-arm64.exe` |
+            | **FreeBSD** | | |
+            | x86-64 | `assettrack-freebsd-amd64` | `insurequote-freebsd-amd64` |
+            | ARM64 | `assettrack-freebsd-arm64` | `insurequote-freebsd-arm64` |
+            | **NetBSD** | | |
+            | x86-64 | `assettrack-netbsd-amd64` | `insurequote-netbsd-amd64` |
+            | ARM64 | `assettrack-netbsd-arm64` | `insurequote-netbsd-arm64` |
+            | **OpenBSD** | | |
+            | x86-64 | `assettrack-openbsd-amd64` | `insurequote-openbsd-amd64` |
+            | ARM64 | `assettrack-openbsd-arm64` | `insurequote-openbsd-arm64` |
             
             ### Verification
             
@@ -287,7 +337,7 @@ jobs:
             ### Running
             
             ```bash
-            # Make executable (Linux/macOS/FreeBSD)
+            # Make executable (Linux/macOS/*BSD)
             chmod +x assettrack-linux-amd64
             
             # Run
