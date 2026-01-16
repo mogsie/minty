@@ -78,10 +78,10 @@ func TestAttributes(t *testing.T) {
 func TestIf(t *testing.T) {
 	template := func(b *Builder) Node {
 		return b.Div(
-			b.If(false, Class("false")),
-			b.If(false, b.P("Condition is false")),
-			b.If(true, Class("true")),
-			b.If(true, b.P("Condition is true")),
+			IfT(false, Class("false")),
+			IfT(false, b.P("Condition is false")),
+			IfT(true, Class("true")),
+			IfT(true, b.P("Condition is true")),
 		)
 	}
 
@@ -97,14 +97,14 @@ func TestIf(t *testing.T) {
 func TestDeeplyNestedIf(t *testing.T) {
 	template := func(b *Builder) Node {
 		return b.Div(
-			b.If(false, b.If(false, Class("false-false-nested"))),
-			b.If(false, b.If(true, Class("false-true-nested"))),
-			b.If(false, b.If(false, b.P("False False"))),
-			b.If(false, b.If(true, b.P("False True"))),
-			b.If(true, b.If(false, Class("true-false-nested"))),
-			b.If(true, b.If(true, Class("true-true-nested"))),
-			b.If(true, b.If(false, b.P("True False"))),
-			b.If(true, b.If(true, b.P("True True"))),
+			IfT(false, IfT(false, Class("false-false-nested"))),
+			IfT(false, IfT(true, Class("false-true-nested"))),
+			IfT(false, IfT(false, b.P("False False"))),
+			IfT(false, IfT(true, b.P("False True"))),
+			IfT(true, IfT(false, Class("true-false-nested"))),
+			IfT(true, IfT(true, Class("true-true-nested"))),
+			IfT(true, IfT(false, b.P("True False"))),
+			IfT(true, IfT(true, b.P("True True"))),
 		)
 	}
 
@@ -124,12 +124,12 @@ func TestDeeplyNestedIfElse(t *testing.T) {
 		for _, outer := range booleans {
 			for _, inner := range booleans {
 				items = append(items,
-					b.IfElse(outer,
-						b.IfElse(inner,
+					IfElseT(outer,
+						IfElseT(inner,
 							Attr(fmt.Sprintf("outer-%v-inner-%v", outer, inner), "yep"),
 							Attr(fmt.Sprintf("outer-%v-inner-%v", outer, inner), "yep nope"),
 						),
-						b.IfElse(inner,
+						IfElseT(inner,
 							Attr(fmt.Sprintf("outer-%v-inner-%v", outer, inner), "nope yep"),
 							Attr(fmt.Sprintf("outer-%v-inner-%v", outer, inner), "nope nope"),
 						),
@@ -166,6 +166,9 @@ func TestDeeplyNestedIfElse(t *testing.T) {
 			}
 		}
 	}
+
+	B.Input(IfElseT(true, Class("this"), Class("that")))
+
 }
 
 // Builder regression test - global instance works

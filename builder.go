@@ -2,6 +2,7 @@ package minty
 
 import (
 	"fmt"
+	"io"
 	"strconv"
 )
 
@@ -19,7 +20,31 @@ func (b *Builder) createElement(tag string, selfClosing bool, args ...interface{
 
 	for _, arg := range args {
 		for range 100 { // break out of infinite loops
-			if eval, ok := arg.(Evaluation); ok {
+			if eval, ok := arg.(Evaluation[Node]); ok {
+				if eval.condition {
+					arg = eval.trueValue
+				} else {
+					arg = eval.falseValue
+				}
+				continue
+			}
+			if eval, ok := arg.(Evaluation[Attribute]); ok {
+				if eval.condition {
+					arg = eval.trueValue
+				} else {
+					arg = eval.falseValue
+				}
+				continue
+			}
+			if eval, ok := arg.(Evaluation[Evaluation[Node]]); ok {
+				if eval.condition {
+					arg = eval.trueValue
+				} else {
+					arg = eval.falseValue
+				}
+				continue
+			}
+			if eval, ok := arg.(Evaluation[Evaluation[Attribute]]); ok {
 				if eval.condition {
 					arg = eval.trueValue
 				} else {
@@ -63,23 +88,54 @@ func (b *Builder) createElement(tag string, selfClosing bool, args ...interface{
 }
 
 // Logic for creating HTML elements
-type Evaluation struct {
+type Evaluation[T any] struct {
 	condition  bool
-	trueValue  any
-	falseValue any
+	trueValue  T
+	falseValue T
+}
+
+// Render implements the Node interface for Evaluation.
+func (e Evaluation[T]) Render(w io.Writer) error {
+	if e.condition {
+		switch v := any(e.trueValue).(type) {
+		case Node:
+			return v.Render(w)
+		}
+		return nil
+	}
+	switch v := any(e.falseValue).(type) {
+	case Node:
+		return v.Render(w)
+	}
+	return nil
+}
+
+// Apply implements the Attribute interface for Evaluation.
+func (e Evaluation[T]) Apply(el *Element) {
+	if e.condition {
+		switch v := any(e.trueValue).(type) {
+		case Attribute:
+			v.Apply(el)
+		}
+	} else {
+		switch v := any(e.falseValue).(type) {
+		case Attribute:
+			v.Apply(el)
+		}
+	}
 }
 
 // If returns the Node if the condition is true, otherwise returns nil.
-func (b *Builder) If(condition bool, item any) Evaluation {
-	return Evaluation{
+func IfT[T any](condition bool, item T) Evaluation[T] {
+	return Evaluation[T]{
 		condition: condition,
 		trueValue: item,
 	}
 }
 
 // IfElse returns the trueNode if condition is true, otherwise returns falseNode.
-func (b *Builder) IfElse(condition bool, trueNode, falseNode any) Evaluation {
-	return Evaluation{
+func IfElseT[T any](condition bool, trueNode, falseNode T) Evaluation[T] {
+	return Evaluation[T]{
 		condition:  condition,
 		trueValue:  trueNode,
 		falseValue: falseNode,
